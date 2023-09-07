@@ -13,10 +13,12 @@ def create_table():
     except:
         pass
 
-    pages_query = 'CREATE TABLE pages (page STRING);'
-    connections_query = 'CREATE TABLE connections (page string, sub_page string);'
-    #db.execute(pages_query)
-    db.execute(connections_query)
+    pages_query = 'CREATE TABLE pages (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, page STRING NOT NULL, connections STRING);'
+    db.execute(pages_query)
     conn.commit()
+#create_table()
 
-create_table()
+def toLower():
+    db.execute('UPDATE pages SET page = LOWER(page)')
+    conn.commit()
+#toLower()
