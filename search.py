@@ -1,13 +1,9 @@
 import sqlite3
 
 
-target = 'philosophy'
-conn = sqlite3.connect('./data.sqlite')
-db = conn.cursor()
-max_depth = 10
-paths = ''
-cur_path = []
-def search(page_id, depth, cur_path):
+
+
+def search(page_id, depth, cur_path, target, max_depth):
     global paths
     if type(page_id) == str:
         
@@ -20,12 +16,12 @@ def search(page_id, depth, cur_path):
     page_info_res = db.execute('SELECT * FROM pages WHERE id == {}'.format(page_id))
     if page_info_res:
         page_info = page_info_res.fetchone()
-        page_name = page_info[1]
+        page_name = str(page_info[1])
 
         if page_name in cur_path:
             return
         cur_path.append(page_name)
-
+        
         if page_name.lower() == target.lower():
             paths += ','.join(cur_path) + '&'
             cur_path.pop()
@@ -42,11 +38,23 @@ def search(page_id, depth, cur_path):
         if connections != None and len(connections) > 0:
             
             for next_id in connections.split(','):
-                search(int(next_id), depth+1, cur_path)
+                search(int(next_id), depth+1, cur_path, target, max_depth)
 
     cur_path.pop()
     return
 
-search('art', 0, cur_path)
-for path in paths.split('&'):
-    print(' -> '.join(path.split(',')))
+def get_connections(start, target, max_depth):
+    global conn
+    global db
+    global paths
+    
+    conn = sqlite3.connect('./data.sqlite')
+    db = conn.cursor()
+    paths = ''
+
+    search(start, 0, [], target, max_depth)
+    
+    return paths.split('&')
+
+x = get_connections('united_kingdom', 'london', 10)
+print(x)
